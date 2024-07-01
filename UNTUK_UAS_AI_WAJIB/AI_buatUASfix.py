@@ -1,11 +1,20 @@
-import tkinter as tk
+"""Bayangkan kamu sedang bermain di taman labirin besar bersama teman-teman. Kamu mulai dari pintu masuk labirin dan ingin menemukan 
+jalan keluar di sisi lain taman. Ada beberapa hal yang bisa membantu kamu mencari jalan, seperti papan petunjuk atau coretan di 
+dinding yang menunjukkan kalau jalan tersebut sudah pernah dilewati. Nah, mari kita coba jelaskan algoritma ini dengan analogi tersebut.
+
+
+
+"""
+
+
+import tkinter as tk #buat animasi
 import time
 from tkinter import Text
 from collections import deque
 import sys
 import psutil
 
-# Variabel global untuk menyimpan labirin dan jalur
+# Variabel global untuk menyimpan labirin dan jalur (inputny)
 maze = [
     [0, 0, 0, 1, 0],
     [0, 1, 0, 1, 0],
@@ -25,10 +34,21 @@ path_taken = []
 start = (9, 0)
 end = (0, 4)
 
-def get_cpu_usage():
-    return psutil.cpu_percent(interval=0.1)
-
 def explore_paths(maze, start, end):
+    """
+    Mengeksplorasi semua jalur dalam labirin menggunakan pendekatan Breadth-First Search (BFS).
+    
+    Arguments:
+        maze (list of list of int): Representasi labirin sebagai matriks.
+        start (tuple of int): Koordinat titik awal dalam labirin.
+        end (tuple of int): Koordinat titik akhir dalam labirin.
+    
+    yang dikembalikan:
+        int: Panjang jalur terpendek dari start ke end.
+        list of tuples: Jalur terpendek dari start ke end.
+        list of list of str: Alasan mengapa jalur lain tidak dipilih.
+        list of tuples: Semua jalur yang dipertimbangkan selama eksplorasi.
+    """
     rows, cols = len(maze), len(maze[0])
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Atas, bawah, kiri, kanan
     queue = deque([start])
@@ -81,6 +101,15 @@ def explore_paths(maze, start, end):
     return len(shortest_path), shortest_path, reasons, all_paths
 
 def get_big_o_complexity(maze):
+    """
+    Menghitung dan mengembalikan kompleksitas Big O berdasarkan ukuran labirin.
+    
+    Args:
+        maze (list of list of int): Representasi labirin sebagai matriks.
+        
+    Returns:
+        str: Notasi Big O yang mewakili kompleksitas algoritma berdasarkan ukuran labirin.
+    """
     rows, cols = len(maze), len(maze[0])
     total_cells = rows * cols
 
@@ -97,16 +126,22 @@ def get_big_o_complexity(maze):
         return "O(n^2) atau lebih"
 
 def get_memory_usage():
-    # Dapatkan penggunaan memori saat ini dalam byte
-    memory_usage = sys.getsizeof(maze) + sys.getsizeof(path_taken) + sys.getsizeof(start) + sys.getsizeof(end)
+    """
+    Menghitung dan mengembalikan penggunaan memori saat ini oleh program.
     
-    # Penggunaan memori tambahan untuk seluruh proses
+    Returns:
+        int: Penggunaan memori saat ini dalam byte.
+    """
+    memory_usage = sys.getsizeof(maze) + sys.getsizeof(path_taken) + sys.getsizeof(start) + sys.getsizeof(end)
     process = psutil.Process()
     total_memory_usage = process.memory_info().rss  # Dapatkan penggunaan memori total dalam byte
     
     return total_memory_usage
 
 def visualize_maze():
+    """
+    Memvisualisasikan labirin dan pencarian jalur terpendek menggunakan Tkinter.
+    """
     global maze
     global path_taken
     global start
@@ -120,8 +155,11 @@ def visualize_maze():
     delay = 100  # milidetik
     
     def create_grid():
-        # Hapus item canvas sebelumnya
-        canvas.delete("all")
+        """
+        Menggambar grid labirin pada canvas dengan warna yang sesuai untuk setiap sel.
+        """
+        
+        canvas.delete("all") # Hapus item canvas sebelumnya
         
         # Gambar border di sekitar canvas
         canvas.create_rectangle(margin, margin, cols*cell_size + margin, rows*cell_size + margin, outline="black", width=border_width)
@@ -146,13 +184,42 @@ def visualize_maze():
                 canvas.create_text(text_x, text_y, text=f"({i},{j})", fill="black")
 
     def highlight_path(path, color):
+        """
+        Menyorot jalur pada canvas dengan warna tertentu.
+        
+        Args:
+            path (list of tuples): Jalur yang akan disorot.
+            color (str): Warna untuk penyorotan jalur (misalnya, "green", "yellow").
+        """
         for (i, j) in path:
             if (i, j) not in [start, end]:
                 canvas.after(delay, lambda i=i, j=j: canvas.itemconfig(cells[(i, j)], fill=color))
                 canvas.update()
                 time.sleep(delay / 1000)
 
+    def create_legend():
+        legend_frame = tk.Frame(root)
+        legend_frame.pack(side=tk.BOTTOM, padx=10, pady=10, fill=tk.X)
+        
+        wall_label = tk.Label(legend_frame, text="Dinding", bg="gray", padx=10, pady=5)
+        wall_label.grid(row=0, column=0, padx=5, pady=5)
+        
+        start_label = tk.Label(legend_frame, text="Titik Awal", bg="blue", padx=10, pady=5)
+        start_label.grid(row=0, column=1, padx=5, pady=5)
+        
+        end_label = tk.Label(legend_frame, text="Titik Akhir", bg="red", padx=10, pady=5)
+        end_label.grid(row=0, column=2, padx=5, pady=5)
+
+        explored = tk.Label(legend_frame, text="jalan yang sudah dilalui", bg="yellow", padx=10, pady=5)
+        explored.grid(row=0, column=3, padx=5, pady=5)  
+
+        shorted = tk.Label(legend_frame, text="jalan terpendek", bg="green", padx=10, pady=5)
+        shorted.grid(row=0, column=4, padx=5, pady=5)          
+
     def reset_visualization():
+        """
+        Mereset visualisasi labirin, menemukan jalur terpendek kembali, dan memperbarui tampilan.
+        """
         global path_taken
         length, path_taken, reasons, all_paths = explore_paths(maze, start, end)
         
@@ -177,6 +244,9 @@ def visualize_maze():
         text_box.insert(tk.END, f"Penggunaan Memori: {memory_usage} byte\n")
 
     def show_big_o_notation():
+        """
+        Menampilkan notasi Big O kompleksitas algoritma berdasarkan ukuran labirin.
+        """
         top = tk.Toplevel(root)
         top.title("Notasi Big O")
         
@@ -221,16 +291,15 @@ def visualize_maze():
     highlight_path(path_taken, "green")  # Sorot jalur terpendek dengan hijau
 
     # Buat text box untuk mencetak alasan
-    text_box = Text(frame, height=20, width=100)
+    text_box = Text(frame, height=20, width=120)
     text_box.grid(row=0, column=1, padx=10, pady=10, sticky=tk.NS)  # Letakkan text box di grid (baris 0, kolom 1)
 
-    # Label untuk menampilkan penggunaan CPU dan memori
-    cpu_label = tk.Label(frame, text="Penggunaan CPU: ", padx=10, pady=10)
-    cpu_label.grid(row=1, column=0, padx=10, pady=10, sticky=tk.W)
+    text_box.configure(font=("Arial", 10), spacing1=5, spacing2=5, spacing3=5)
     
     memory_label = tk.Label(frame, text="Penggunaan Memori: ", padx=10, pady=10)
     memory_label.grid(row=1, column=1, padx=10, pady=10, sticky=tk.W)
 
+    create_legend()  # Tambahkan legenda
     
     # Tombol untuk mereset visualisasi
     reset_button = tk.Button(frame, text="Reset Visualisasi", command=reset_visualization)
@@ -241,10 +310,9 @@ def visualize_maze():
     big_o_button.grid(row=1, column=1, padx=10, pady=10, sticky=tk.EW)  # Letakkan tombol di grid (baris 1, kolom 1)
 
     def update_metrics():
-        # Perbarui label penggunaan CPU
-        cpu_usage = get_cpu_usage()
-        cpu_label.config(text=f"Penggunaan CPU: {cpu_usage}%")
-        
+        """
+        Memperbarui label dengan penggunaan memori saat ini.
+        """    
         # Perbarui label penggunaan memori
         memory_usage= get_memory_usage()
         memory_label.config(text=f"Penggunaan Memori: {memory_usage} byte")
