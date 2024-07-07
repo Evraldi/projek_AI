@@ -1,12 +1,3 @@
-"""Bayangkan kamu sedang bermain di taman labirin besar bersama teman-teman. Kamu mulai dari pintu masuk labirin dan ingin menemukan 
-jalan keluar di sisi lain taman. Ada beberapa hal yang bisa membantu kamu mencari jalan, seperti papan petunjuk atau coretan di 
-dinding yang menunjukkan kalau jalan tersebut sudah pernah dilewati. Nah, mari kita coba jelaskan algoritma ini dengan analogi tersebut.
-
-
-
-"""
-
-
 import tkinter as tk #buat animasi
 import time
 from tkinter import Text
