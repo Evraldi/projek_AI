@@ -20,8 +20,8 @@ This project visualizes the process of finding the shortest path in a maze using
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/Evraldi/projek_uas_AI.git
-    cd projek_uas_AI
+    git clone https://github.com/Evraldi/projek_AI.git
+    cd projek_AI
     ```
 
 2. (Optional) Create a virtual environment and activate it:
@@ -42,4 +42,4 @@ This project visualizes the process of finding the shortest path in a maze using
 Run the script to start the visualization:
 
 ```bash
-python AI_buatUASfix.py
+python AI_fix.py
